@@ -1,6 +1,11 @@
-import "./Modal.css";
-import { useEffect, useRef } from "react";
+import ReactDOM from "react-dom";
 import PropTypes from "prop-types";
+
+import { motion } from "framer-motion";
+
+import useOutsideClick from "./../../hooks/useOutsideClick";
+import "./Modal.css";
+import useCreateDivForPortal from "../../hooks/useCreateDivForPortal";
 
 const Modal = ({
   children,
@@ -9,28 +14,32 @@ const Modal = ({
   closeOnClickOutside = false,
   hasBackdrop = true,
 }) => {
-  const modalRef = useRef();
-
-  useEffect(() => {
-    function handleClickOutside(event) {
-      if (modalRef.current && !modalRef.current.contains(event.target)) {
-        if (closeOnClickOutside) setModalVisibility(false);
-      }
-    }
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+  const modalRef = useOutsideClick(() => {
+    if (closeOnClickOutside) setModalVisibility(false);
   });
 
-  return (
-    <>
-      {hasBackdrop && <div className="backdrop"></div>}
-      <div className={`modal ${className}`} ref={modalRef}>
+  const newDivForPortal = useCreateDivForPortal("root-modal");
+  return ReactDOM.createPortal(
+    <div className="modal-container">
+      {hasBackdrop && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1, transition: { duration: 0.3 } }}
+          exit={{ opacity: 0 }}
+          className="backdrop"
+        ></motion.div>
+      )}
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={{ scale: 1, top: "unset", transition: { delay: 0.1 } }}
+        exit={{ scale: 0 }}
+        className={`modal ${className}`}
+        ref={modalRef}
+      >
         {children}
-      </div>
-    </>
+      </motion.div>
+    </div>,
+    newDivForPortal
   );
 };
 

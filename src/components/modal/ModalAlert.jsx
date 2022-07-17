@@ -1,5 +1,9 @@
-import Modal from "./Modal";
 import PropTypes from "prop-types";
+
+import Modal from "./Modal";
+import useOnEnter from "./../../hooks/useOnEnter";
+import useOnEscape from "./../../hooks/useOnEscape";
+import useGiveFocus from "./../../hooks/useGiveFocus";
 
 const ModalAlert = ({
   setModalVisibility,
@@ -16,6 +20,10 @@ const ModalAlert = ({
     setModalVisibility(false);
   };
 
+  const confirmBtnRef = useGiveFocus();
+  useOnEnter(confirmHandler);
+  useOnEscape(() => setModalVisibility(false));
+
   return (
     <Modal
       setModalVisibility={setModalVisibility}
@@ -27,6 +35,7 @@ const ModalAlert = ({
       <div className="description">{description}</div>
       <div className="buttons">
         <button
+          ref={confirmBtnRef}
           type="button"
           className={isDanger ? "danger" : "confirm"}
           onClick={confirmHandler}

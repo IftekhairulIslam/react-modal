@@ -1,5 +1,7 @@
 import Modal from "./Modal";
 import PropTypes from "prop-types";
+import useOnEnterOnEscape from "../../hooks/useOnEnterOnEscape";
+import useGiveFocus from "./../../hooks/useGiveFocus";
 
 const ModalConfirm = ({
   setModalVisibility,
@@ -23,6 +25,9 @@ const ModalConfirm = ({
     setModalVisibility(false);
   };
 
+  const confirmBtnRef = useGiveFocus();
+  useOnEnterOnEscape(confirmHandler, cancelHandler);
+
   return (
     <Modal
       setModalVisibility={setModalVisibility}
@@ -37,6 +42,7 @@ const ModalConfirm = ({
           {cancelButtonText}
         </button>
         <button
+          ref={confirmBtnRef}
           type="button"
           className={isDanger ? "danger" : "confirm"}
           onClick={confirmHandler}
